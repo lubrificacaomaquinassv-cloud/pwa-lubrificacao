@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0b1b2b" />
+  <meta name="description" content="PWA Lubrificacao de frota" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="stylesheet" href="./styles.css" />
+  <title>LUBRIFICACAO DE FROTA</title>
+</head>
+<body>
+<main class="container">
+  <header class="header">
+    <div class="brand">
+      <img src="./assets/logo_sv.png" alt="Logo" class="brand-logo" />
+      <h1>LUBRIFICACAO DE FROTA</h1>
+    </div>
+    <p class="subtitle">Troca de oleo e filtros — suporte offline</p>
+    <p id="connection-status" class="connection-status" aria-live="polite"></p>
+    <p id="db-sync-status" class="connection-status" aria-live="polite"></p>
+  </header>
+
+  <section class="card">
+    <h2>Tipo de servico</h2>
+    <div class="mode-switch" role="group">
+      <button type="button" id="tipo-preventiva" class="mode-btn active">Preventiva</button>
+      <button type="button" id="tipo-corretiva" class="mode-btn">Corretiva</button>
+      <button type="button" id="tipo-completar" class="mode-btn">Completar nivel</button>
+    </div>
+    <p class="subtitle" id="tipo-desc">Troca normal de oleo e/ou filtro conforme plano de manutencao.</p>
+  </section>
+
+  <section class="card">
+    <h2>Identificacao</h2>
+    <form id="lub-form" class="form-stack">
+      <div class="form-section">
+        <p class="form-section-kicker">Quando e frota</p>
+        <div class="form-grid">
+          <label>
+            Data e hora
+            <input id="lubDateTime" name="lubDateTime" type="datetime-local" required />
+          </label>
+          <label>
+            Frota / Equipamento
+            <input id="vehicle" name="vehicle" placeholder="Ex.: 3355" required />
+          </label>
+          <label class="field-span-full">
+            Operador / Motorista
+            <input id="operator" name="operator" placeholder="Ex.: Joao Silva" required />
+          </label>
+          <label class="field-span-full">
+            Local / Retiro
+            <input id="location" name="location" placeholder="Ex.: Retiro Norte" required />
+          </label>
+        </div>
+      </div>
+
+      <div class="form-section" id="section-horimetro">
+        <p class="form-section-kicker">Horimetro</p>
+        <div class="form-grid">
+          <label>
+            Horimetro atual (h)
+            <input id="hourmeterAtual" name="hourmeterAtual" type="number" step="0.1" min="0" placeholder="Ex.: 3210" />
+          </label>
+          <label id="label-prox-troca">
+            Horimetro proxima troca (h)
+            <input id="hourmeterProx" name="hourmeterProx" type="number" step="0.1" min="0" placeholder="Ex.: 3710" />
+          </label>
+        </div>
+        <p id="intervalo-preview" class="connection-status online" aria-live="polite"></p>
+      </div>
+
+      <div class="form-section" id="section-oleo">
+        <p class="form-section-kicker">Oleo (ate 3 tipos)</p>
+        <div class="form-grid">
+          <label>
+            Tipo de oleo 1
+            <select id="oilType1" name="oilType1">
+              <option value="">Selecione</option>
+            </select>
+          </label>
+          <label>
+            Quantidade (L)
+            <input id="oilQty1" name="oilQty1" type="number" step="0.1" min="0" placeholder="Ex.: 27" />
+          </label>
+          <label>
+            Tipo de oleo 2
+            <select id="oilType2" name="oilType2">
+              <option value="">Selecione</option>
+            </select>
+          </label>
+          <label>
+            Quantidade (L)
+            <input id="oilQty2" name="oilQty2" type="number" step="0.1" min="0" placeholder="Ex.: 1.5" />
+          </label>
+          <label>
+            Tipo de oleo 3
+            <select id="oilType3" name="oilType3">
+              <option value="">Selecione</option>
+            </select>
+          </label>
+          <label>
+            Quantidade (L)
+            <input id="oilQty3" name="oilQty3" type="number" step="0.1" min="0" placeholder="Ex.: 3" />
+          </label>
+        </div>
+      </div>
+
+      <div class="form-section" id="section-filtro">
+        <p class="form-section-kicker">Filtro (ate 2 tipos)</p>
+        <div class="form-grid">
+          <label>
+            Tipo de filtro 1
+            <select id="filterType1" name="filterType1">
+              <option value="">Selecione</option>
+            </select>
+          </label>
+          <label>
+            Quantidade
+            <input id="filterQty1" name="filterQty1" type="number" step="1" min="0" placeholder="Ex.: 2" />
+          </label>
+          <label>
+            Tipo de filtro 2
+            <select id="filterType2" name="filterType2">
+              <option value="">Selecione</option>
+            </select>
+          </label>
+          <label>
+            Quantidade
+            <input id="filterQty2" name="filterQty2" type="number" step="1" min="0" placeholder="Ex.: 1" />
+          </label>
+        </div>
+      </div>
+
+      <label id="section-observacao" class="field-span-full">
+        Observacao <span id="obs-required-label"></span>
+        <textarea id="observation" name="observation" rows="3" placeholder="Descreva o motivo ou detalhes do servico"></textarea>
+      </label>
+
+      <button type="submit">Registrar servico</button>
+    </form>
+  </section>
+
+  <section class="card">
+    <h2>Ultimos 5 servicos</h2>
+    <div class="recent-table" role="table">
+      <div class="recent-row recent-head" role="row">
+        <span role="columnheader">Frota</span>
+        <span role="columnheader">Tipo</span>
+        <span role="columnheader">Data</span>
+      </div>
+      <ul id="recent-list" class="recent-body"></ul>
+    </div>
+  </section>
+
+  <section class="card informe-card">
+    <h2>Registros e alteracoes</h2>
+    <p class="subtitle informe-text">
+      Os lancamentos sao definitivos. Correcoes somente via banco de dados pela gestao.
+    </p>
+  </section>
+</main>
+<script src="./config.js?v=1"></script>
+<script src="./app.js?v=1"></script>
+</body>
+</html>
